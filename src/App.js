@@ -1,25 +1,41 @@
-import logo from './logo.svg';
+import React, {useState, useEffect} from "react";
 import './App.css';
+import List from "./components/List";
+import Details from "./components/Details";
+
+const url = 'https://raw.githubusercontent.com/netology-code/ra16-homeworks/master/hooks-context/use-effect/data/users.json';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    const [list, setList] = useState([]);
+    const [details, setDetails] = useState({});
+
+    const update = async () => {
+        const list = await fetch(url, {method: 'GET'}).then(response => {
+            return response.json();
+        });
+        setList(() => {
+            return list;
+        })
+    }
+
+    useEffect(update, []);
+
+    const onClickListItem = (data) => {
+        setDetails(data)
+    }
+
+    if (!list.length) {
+        return 'Loading...'
+    }
+
+    return (
+        <>
+            <div className={"main"}>
+                <List list={list} onClickListItem={onClickListItem}/>
+            </div>
+            <Details info={details}/>
+        </>
+    );
 }
 
 export default App;
