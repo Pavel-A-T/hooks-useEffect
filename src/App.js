@@ -8,14 +8,23 @@ const url = 'https://raw.githubusercontent.com/netology-code/ra16-homeworks/mast
 function App() {
     const [list, setList] = useState([]);
     const [details, setDetails] = useState({});
+    const [status, setStatus] = useState({
+        loading: false,
+        error: undefined
+    })
 
     const update = async () => {
-        const list = await fetch(url, {method: 'GET'}).then(response => {
-            return response.json();
-        });
-        setList(() => {
-            return list;
-        })
+        setStatus({loading:true});
+        try {
+            const list = await fetch(url, {method: 'GET'}).then(response => {
+                setStatus({loading: false});
+                return response.json();
+            });
+            setList(()=>{return  list});
+
+        } catch (error) {
+            setStatus({loading: false, error});
+        }
     }
 
     useEffect(update, []);
@@ -24,8 +33,13 @@ function App() {
         setDetails(data)
     }
 
-    if (!list.length) {
+    if (status.loading) {
         return 'Loading...'
+    }
+    if (status.error) {
+        console.log('error', status.error);
+        setStatus({error:undefined})
+        return null;
     }
 
     return (
